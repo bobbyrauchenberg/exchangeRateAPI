@@ -1,4 +1,4 @@
-package com.example.exchangeRateApi
+package com.rauchenberg.exchangeRateApi.common
 
 import cats.scalatest.{EitherMatchers, EitherValues}
 import org.scalatest.matchers.should.Matchers

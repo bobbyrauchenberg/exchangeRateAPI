@@ -1,12 +1,12 @@
-package com.example.exchangeRateApi
+package com.rauchenberg.exchangeRateApi.domain
 
 import cats.Applicative
 import cats.effect.Sync
-import io.circe.{Decoder, DecodingFailure, Encoder}
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import org.http4s.{EntityDecoder, EntityEncoder}
-import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import cats.syntax.either._
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.{Decoder, Encoder}
+import org.http4s.circe.{jsonEncoderOf, jsonOf}
+import org.http4s.{EntityDecoder, EntityEncoder}
 
 final case class Error(errorMsg: String)
 object Error {
@@ -19,12 +19,17 @@ object Error {
 
 final case class Rate(countryCode: String, rate: BigDecimal)
 object Rate {
+  /*
+    this is needed to handle the fact that the name of the key being decoded is dynamic
+    and won't ever map directly to any particular case class field name
+   */
   implicit val decoder: Decoder[Rate] =
     Decoder[Map[String, BigDecimal]].prepare(_.downField("rates")).emap { _.map {
         case (k, v) => Rate(k, v)
       }.headOption.fold("couldn't parse result".asLeft[Rate])(_.asRight[String])
     }
   implicit def entityDecoder[F[_]: Sync]: EntityDecoder[F, Rate] = jsonOf
+
   implicit val encoder: Encoder[Rate] = deriveEncoder[Rate]
   implicit def entityEncoder[F[_]: Applicative]: EntityEncoder[F, Rate] = jsonEncoderOf
 }
@@ -34,6 +39,8 @@ object ConversionRequest {
   implicit val decoder: Decoder[ConversionRequest] = deriveDecoder[ConversionRequest]
   implicit def entityDecoder[F[_]: Sync]: EntityDecoder[F, ConversionRequest] =
     jsonOf
+  implicit val encoder: Encoder[ConversionRequest] = deriveEncoder[ConversionRequest]
+  implicit def entityEncoder[F[_]: Applicative]: EntityEncoder[F, ConversionRequest] = jsonEncoderOf
 }
 
 case class ConversionResult(exchange: BigDecimal, amount: BigDecimal, original: BigDecimal)

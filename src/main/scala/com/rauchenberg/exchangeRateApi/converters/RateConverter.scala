@@ -1,4 +1,6 @@
-package com.example.exchangeRateApi
+package com.rauchenberg.exchangeRateApi.converters
+
+import com.rauchenberg.exchangeRateApi.domain.ConversionResult
 
 import scala.math.BigDecimal.RoundingMode
 

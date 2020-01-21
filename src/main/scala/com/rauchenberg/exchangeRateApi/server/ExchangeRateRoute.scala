@@ -1,16 +1,16 @@
-package com.example.exchangeRateApi
+package com.rauchenberg.exchangeRateApi.server
 
-import org.http4s.circe.CirceEntityEncoder._
-import cats.effect.{Async, Sync}
 import cats.implicits._
-import com.example.exchangeRateApi.OutboundHttpCall.HttpCallError
+import cats.effect.{Async, Sync}
+import com.rauchenberg.exchangeRateApi.domain.{ConversionRequest, ConversionResult, Error, Rate}
+import com.rauchenberg.exchangeRateApi.httpClient.OutboundHttpCall.OutboundCallResult
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 
-object ExchangeRateConversionRoute {
+object ExchangeRateRoute {
 
-  def exchangeRateRoute[F[_] : Async : Sync](getExchangeRate: (String, String) => F[HttpCallError[Rate]],
-                                      converterFunction: (BigDecimal, BigDecimal) => ConversionResult): HttpRoutes[F] = {
+  def exchangeRateRoute[F[_] : Async : Sync](getExchangeRate: (String, String) => F[OutboundCallResult[Rate]],
+                                             converterFunction: (BigDecimal, BigDecimal) => ConversionResult): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
     import dsl._
 

@@ -10,7 +10,6 @@ val ScalacheckVersion = "3.1.0.0"
 val RandomDataGeneratorVersion = "2.7"
 val WiremockVersion = "2.25.1"
 
-
 lazy val root = (project in file("."))
   .settings(
     organization := "com.rauchenberg",

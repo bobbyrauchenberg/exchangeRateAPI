@@ -1,6 +1,6 @@
 # ExchangeRateAPI
 
-An app to convert between currencies, built using HTTP4S
+An app to convert between currencies, built using HTTP4S, calls a 3rd party exchange rate service
 
 ## Running the app
 

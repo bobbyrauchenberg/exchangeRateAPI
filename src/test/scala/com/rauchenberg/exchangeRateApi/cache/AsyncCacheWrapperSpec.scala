@@ -28,7 +28,7 @@ class AsyncCacheWrapperSpec extends UnitSpecBase {
     implicit val caffeineCache: Cache[Int] = CaffeineCache[Int]
     val mutableQueue = Queue(1, 2)
 
-    def f = IO.pure(mutableQueue.dequeue)
+    def f = IO(mutableQueue.dequeue)
 
     def functionWrappedInCache(ttl: Option[Duration]) = AsyncCacheWrapper[Int, IO, Id]("cacheKey", ttl, f)
 

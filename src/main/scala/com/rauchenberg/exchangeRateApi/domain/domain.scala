@@ -28,7 +28,7 @@ object Rate {
         case (k, v) => Rate(k, v)
       }.headOption.fold("couldn't parse result".asLeft[Rate])(_.asRight[String])
     }
-  implicit def entityDecoder[F[_]: Sync]: EntityDecoder[F, Rate] = jsonOf
+  implicit def entityDecoder[F[_]]: EntityDecoder[F, Rate] = jsonOf
 
   implicit val encoder: Encoder[Rate] = deriveEncoder[Rate]
   implicit def entityEncoder[F[_]: Applicative]: EntityEncoder[F, Rate] = jsonEncoderOf

@@ -1,13 +1,13 @@
 package com.rauchenberg.exchangeRateApi.algebras
 
-import cats.{Applicative, ApplicativeError, Functor}
+import cats.MonadError
 import cats.effect._
 import cats.implicits._
-import com.rauchenberg.exchangeRateApi.domain.{Error, Rate}
+import com.rauchenberg.exchangeRateApi.domain.Rate
 import org.http4s.Method.GET
 import org.http4s.client.Client
 import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.{Status, Uri}
+import org.http4s.{EntityDecoder, Status, Uri}
 
 case class RateError(msg: String) extends Throwable
 
@@ -18,14 +18,14 @@ trait ExchangeRate[F[_]] {
 }
 
 object LiveExchangeRate {
-  def make[F[_]](client: Client[F], uri: String)(implicit F: ApplicativeError[F, Rate]) =
-    new LiveExchangeRate[F](client, uri)
+  def make[F[_] : Sync](client: Client[F], uri: String)(implicit ME: MonadError[F, Throwable], ED: EntityDecoder[F, Rate]) =
+    Sync[F].delay(new LiveExchangeRate[F](client, uri))
 }
 
 final class LiveExchangeRate[F[_]] private(
   client: Client[F],
   uri: String
-)(implicit F: ApplicativeError[F, Rate]) extends ExchangeRate[F] {
+)(implicit ME: MonadError[F, Throwable], ED: EntityDecoder[F, Rate]) extends ExchangeRate[F] {
   override def getRate(from: String, to: String): F[Rate] = {
     val dsl = new Http4sClientDsl[F] {}
     import dsl._
@@ -35,11 +35,11 @@ final class LiveExchangeRate[F[_]] private(
         client.fetch(GET(u)) {
           case Status.Successful(r) =>
             r.attemptAs[Rate].fold(e => RateError(e.getMessage()).raiseError[F, Rate],
-              v => F.pure(v)).flatten
-          case r =>
-            Functor[F].map(r.as[String])(s => RateError(s).raiseError[F, Rate]).flatten
+              v => ME.pure(v))
+          case _ =>
+            ME.pure(RateError("can't get exchange rate").raiseError[F, Rate])
         }
-      }.flatMap(_.fold(e => RateError(e.getMessage()).raiseError[F, Rate], v => F.pure(v)))
+      }.flatMap(_.fold(e => RateError(e.getMessage()).raiseError[F, Rate], identity))
   }
 
 }

@@ -5,16 +5,14 @@ import cats.implicits._
 import com.rauchenberg.exchangeRateApi.cache.AsyncCacheWrapper
 import com.rauchenberg.exchangeRateApi.converters.RateConverter
 import com.rauchenberg.exchangeRateApi.domain.{Rate, UserInterpreter}
-import com.rauchenberg.exchangeRateApi.httpClient.OutboundHttpCall
-import com.rauchenberg.exchangeRateApi.httpClient.OutboundHttpCall.OutboundCallResult
 import com.rauchenberg.exchangeRateApi.modules.Algebras
 import com.rauchenberg.exchangeRateApi.server.ExchangeRateServer.bigDecimalScale
 import fs2.Stream
-import org.http4s.{HttpApp, HttpRoutes}
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.middleware.Logger
+import org.http4s.{HttpApp, HttpRoutes}
 import scalacache.Cache
 import scalacache.caffeine.CaffeineCache
 
